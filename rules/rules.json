@@ -1,0 +1,140 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "rule_id": "GDP-01",
+      "title": "Document Title on First Page Matches File Name",
+      "category": "header",
+      "severity": "high",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Verify whether the document title on the first page matches the uploaded file name.",
+      "recommendation": "Ensure the first page title matches the file name.",
+      "applies_to_sections": ["first_page", "header"],
+      "requires_metadata": ["file_name"]
+    },
+    {
+      "rule_id": "GDP-02",
+      "title": "Author Name and Role Are Mentioned",
+      "category": "header",
+      "severity": "medium",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Check whether both author name and author role are mentioned in the document.",
+      "recommendation": "Add author name and role information.",
+      "applies_to_sections": ["first_page", "header"]
+    },
+    {
+      "rule_id": "GDP-03",
+      "title": "Dates in Revision History Are Valid",
+      "category": "revision_history",
+      "severity": "medium",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that all dates in the revision history are valid calendar dates.",
+      "recommendation": "Correct invalid revision dates.",
+      "applies_to_sections": ["revision_history"]
+    },
+    {
+      "rule_id": "GDP-04",
+      "title": "Version Number Present in Title and Revision History",
+      "category": "revision_history",
+      "severity": "high",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that version number is present in both title section and revision history section.",
+      "recommendation": "Add version information consistently.",
+      "applies_to_sections": ["first_page", "header", "revision_history"]
+    },
+    {
+      "rule_id": "GDP-05",
+      "title": "Revision Section Is Present",
+      "category": "revision_history",
+      "severity": "medium",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that a revision history section exists in the document.",
+      "recommendation": "Add a revision history section.",
+      "applies_to_sections": ["revision_history", "full"]
+    },
+    {
+      "rule_id": "GDP-06",
+      "title": "Signature Blocks Are Present",
+      "category": "approval",
+      "severity": "high",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that approval or signature blocks exist in the document.",
+      "recommendation": "Add approval signature blocks.",
+      "applies_to_sections": ["approval"]
+    },
+    {
+      "rule_id": "GDP-07",
+      "title": "Dates Present Near Signatures",
+      "category": "approval",
+      "severity": "medium",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that dates are present near signature blocks.",
+      "recommendation": "Add signature dates.",
+      "applies_to_sections": ["approval"]
+    },
+    {
+      "rule_id": "GDP-08",
+      "title": "Basic Font and Spacing Consistency",
+      "category": "formatting",
+      "severity": "low",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Evaluate whether font usage and spacing appear reasonably consistent throughout the document.",
+      "recommendation": "Standardize fonts and spacing.",
+      "applies_to_sections": ["body", "full"],
+      "always_include": true
+    },
+    {
+      "rule_id": "GDP-09",
+      "title": "Language Errors Identified",
+      "category": "language",
+      "severity": "medium",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Identify grammar, spelling, or language quality issues.",
+      "recommendation": "Review language and grammar.",
+      "applies_to_sections": ["body", "full"],
+      "always_include": true
+    },
+    {
+      "rule_id": "GDP-10",
+      "title": "Required Sections Present",
+      "category": "structure",
+      "severity": "high",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Verify that mandatory sections such as Objective, Scope, Responsibilities, Procedure, and References are present.",
+      "recommendation": "Add missing mandatory sections.",
+      "applies_to_sections": ["structure", "full"],
+      "always_include": true
+    },
+    {
+      "rule_id": "GDP-11",
+      "title": "Page Numbers Present and Sequential",
+      "category": "footer",
+      "severity": "medium",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that page numbers are present and sequential throughout the document.",
+      "recommendation": "Correct page numbering.",
+      "applies_to_sections": ["footer", "full"]
+    },
+    {
+      "rule_id": "GDP-12",
+      "title": "Readability Within Acceptable Range",
+      "category": "language",
+      "severity": "low",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Assess whether the document readability is acceptable for its intended audience.",
+      "recommendation": "Improve readability.",
+      "applies_to_sections": ["body", "full"],
+      "always_include": true
+    },
+    {
+      "rule_id": "GDP-13",
+      "title": "Footer Contains Doc ID, Page Number, Confidentiality",
+      "category": "footer",
+      "severity": "high",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Verify that footer contains document ID, page number, and confidentiality statement.",
+      "recommendation": "Add required footer information.",
+      "applies_to_sections": ["footer"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "embedding_provider":"local",
+  "embedding_model": "all-MiniLM-L6-v2",
+  "embedding_model_path": "model",
+  "chroma_collection": "gdp_rules",
+  "whole_doc": {
+    "prompt": "prompts/compliance_check_whole_doc.txt",
+    "send_all_rules": true
+  },
+  "chunk_rag": {
+    "prompt": "prompts/compliance_check_chunk.txt",
+    "top_k_rules_per_chunk": 5,
+    "always_include_rule_ids": ["GDP-08", "GDP-09", "GDP-10"],
+    "skip_chunk_ids": ["full_document"],
+    "fallback_to_all_rules_if_empty": true
+  },
+  "aggregation": {
+    "fail_if_any_chunk_fails": true
+  }
+}

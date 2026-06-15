@@ -1,0 +1,7 @@
+{
+  "engine": "easyocr",
+  "languages": ["en"],
+  "dpi": 300,
+  "fallback_to_page_chunks": true,
+  "gpu": false
+}
