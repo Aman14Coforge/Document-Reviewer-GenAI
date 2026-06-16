@@ -134,18 +134,53 @@ def _extract_document_from_prompt(prompt: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+# def _extract_rules_from_prompt(prompt: str) -> list[dict]:
+#     marker = "RULES TO EVALUATE:"
+#     start = prompt.find(marker)
+#     if start == -1:
+#         return []
+#     rules_text = prompt[start + len(marker) :].split("DOCUMENT CONTENT:", maxsplit=1)[0].strip()
+#     try:
+#         parsed = json.loads(rules_text)
+#         return parsed if isinstance(parsed, list) else parsed.get("rules", [])
+#     except json.JSONDecodeError:
+#         return []
+
+
 def _extract_rules_from_prompt(prompt: str) -> list[dict]:
-    marker = "RULES TO EVALUATE:"
-    start = prompt.find(marker)
+    markers = [
+        "MATCHED RULES FOR THIS CHUNK (evaluate every rule below):",
+        "MATCHED RULES FOR THIS CHUNK:",
+        "RULES TO EVALUATE:",
+    ]
+
+    start = -1
+    marker_len = 0
+
+    for marker in markers:
+        idx = prompt.find(marker)
+        if idx != -1:
+            start = idx
+            marker_len = len(marker)
+            break
+
     if start == -1:
         return []
-    rules_text = prompt[start + len(marker) :].split("DOCUMENT CONTENT:", maxsplit=1)[0].strip()
+
+    rules_text = prompt[start + marker_len:].split(
+        "CHUNK CONTENT:", maxsplit=1
+    )[0].strip()
+
+    if "DOCUMENT CONTENT:" in rules_text:
+        rules_text = rules_text.split(
+            "DOCUMENT CONTENT:", maxsplit=1
+        )[0].strip()
+
     try:
         parsed = json.loads(rules_text)
         return parsed if isinstance(parsed, list) else parsed.get("rules", [])
     except json.JSONDecodeError:
         return []
-
 
 def _dummy_rule_verdict(rule: dict, document_text: str, file_name: str) -> tuple[str, str, str, float]:
     rule_id = rule.get("rule_id", "")

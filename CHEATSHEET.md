@@ -86,8 +86,8 @@ python scripts/validate_document.py
 
 # 2. Extract
 python scripts/extract_document.py "docs/your_doc.pdf"
-python scripts/extract_document.py "docs/scanned.pdf" --mode ocr
-
+python scripts/extract_document.py "docs/PII_Medical_PDF 1.pdf" --mode ocr
+docs\PII_Medical_PDF 1.pdf
 # 3. Chunk
 python scripts/chunk_document.py "output/extracted/your_doc_<timestamp>_extracted.json"
 
