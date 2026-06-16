@@ -2,16 +2,27 @@
 
 from __future__ import annotations
 
-from src.embedding_client import EMBED_MODEL, EXPECTED_DIM, embed_documents
+from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
+
+from src.embedding_client import EMBED_MODEL, EXPECTED_DIM
+from src.embedding_client import embed_documents as api_embed_documents
+from src.embedding_client import embed_query as api_embed_query
 
 
-class ModelGardenEmbeddingFunction:
-    """Chroma-compatible wrapper around embedding_client.embed_documents."""
+class ModelGardenEmbeddingFunction(EmbeddingFunction[Documents]):
+    """Chroma wrapper around Model Garden embedding API."""
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         dim = EXPECTED_DIM or "auto"
         model = EMBED_MODEL or "unknown"
         return f"model_garden_{model}_{dim}"
 
-    def __call__(self, input: list[str]) -> list[list[float]]:
-        return embed_documents(input)
+    def __call__(self, input: Documents) -> Embeddings:
+        return api_embed_documents(list(input))
+
+    def embed_query(self, input: Documents) -> Embeddings:
+        """Embed search queries — required by Chroma on collection.query()."""
+        if len(input) == 1:
+            return [api_embed_query(input[0])]
+        return api_embed_documents(list(input))
