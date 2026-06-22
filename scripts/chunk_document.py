@@ -64,11 +64,26 @@ def load_extracted(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def normalize_page_lines(page_text: str, page_number: int) -> list[str]:
+# def normalize_page_lines(page_text: str, page_number: int) -> list[str]:
+#     lines = [line.strip() for line in page_text.splitlines() if line.strip()]
+#     if lines and lines[0] == str(page_number):
+#         lines = lines[1:]
+#     return merge_split_headings(lines)
+def normalize_page_lines(page_text: str, page_number: int) -> tuple[list[str], list[str]]:
     lines = [line.strip() for line in page_text.splitlines() if line.strip()]
-    if lines and lines[0] == str(page_number):
-        lines = lines[1:]
-    return merge_split_headings(lines)
+
+    content_lines = []
+    page_numbers = []
+
+    for i, line in enumerate(lines):
+        # ✅ Only last line and must match page number
+        if i == len(lines) - 1 and line.isdigit() and line == str(page_number):
+            page_numbers.append(line)
+        else:
+            content_lines.append(line)
+
+    return merge_split_headings(content_lines), page_numbers
+
 
 
 def merge_split_headings(lines: list[str]) -> list[str]:
@@ -104,26 +119,54 @@ def is_section_boundary(line: str) -> bool:
     return False
 
 
+# def detect_section_type(text: str, page_number: int, heading: str) -> str:
+#     probe = f"{heading}\n{text}"
+#     if page_number == 1:
+#         return "first_page"
+#     if REVISION_PATTERNS.search(probe):
+#         return "revision_history"
+#     if APPROVAL_PATTERNS.search(probe):
+#         return "approval"
+#     if TOC_PATTERNS.search(probe):
+#         return "structure"
+#     if TOP_LEVEL_SECTION.match(heading) or MAJOR_SECTION.match(heading):
+#         return "structure"
+#     if STRUCTURE_HEADING.search(heading):
+#         return "structure"
+#     if FOOTER_PATTERNS.search(probe):
+#         return "footer"
+#     return "body"
 def detect_section_type(text: str, page_number: int, heading: str) -> str:
     probe = f"{heading}\n{text}"
+
     if page_number == 1:
         return "first_page"
+
     if REVISION_PATTERNS.search(probe):
         return "revision_history"
+
     if APPROVAL_PATTERNS.search(probe):
         return "approval"
+
     if TOC_PATTERNS.search(probe):
-        return "structure"
-    if TOP_LEVEL_SECTION.match(heading) or MAJOR_SECTION.match(heading):
-        return "structure"
+        return "structure"  # ✅ Only TOC is structure
+
+    # ❌ REMOVE this behavior (it was causing wrong classification)
+    # if TOP_LEVEL_SECTION.match(heading) or MAJOR_SECTION.match(heading):
+    #     return "structure"
+
+    # ❌ CHANGE this: headings like Introduction should be BODY
     if STRUCTURE_HEADING.search(heading):
-        return "structure"
+        return "body"
+
     if FOOTER_PATTERNS.search(probe):
         return "footer"
+
     return "body"
 
+def split_page_lines(lines: list[str], page_number: int, page: dict) -> list[dict]:
 
-def split_page_lines(lines: list[str], page_number: int) -> list[dict]:
+#def split_page_lines(lines: list[str], page_number: int) -> list[dict]:
     if not lines:
         return []
 
@@ -141,6 +184,7 @@ def split_page_lines(lines: list[str], page_number: int) -> list[dict]:
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
+                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
             }
         ]
 
@@ -154,6 +198,7 @@ def split_page_lines(lines: list[str], page_number: int) -> list[dict]:
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": page_text.strip(),
+                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
             }
         ]
 
@@ -174,6 +219,7 @@ def split_page_lines(lines: list[str], page_number: int) -> list[dict]:
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
+                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
             }
         )
         current_lines = []
@@ -214,6 +260,7 @@ def chunk_pages_only(pages: list[dict], page_count: int) -> list[dict]:
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
+                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
             }
         )
     return chunks
@@ -236,6 +283,68 @@ def preprocess_pages_for_chunking(extracted: dict) -> list[dict]:
     return processed
 
 
+# def chunk_document(extracted: dict) -> dict:
+#     is_ocr = extracted.get("extraction_method") == "ocr"
+#     pages = preprocess_pages_for_chunking(extracted)
+#     chunks: list[dict] = []
+
+#     use_page_chunks = False
+#     if is_ocr:
+#         from src.ocr.config import load_ocr_config
+
+#         use_page_chunks = load_ocr_config().get("fallback_to_page_chunks", True)
+
+#     if use_page_chunks:
+#         chunks.extend(chunk_pages_only(pages, extracted.get("page_count", len(pages))))
+#     else:
+#         for page in pages:
+#             page_number = page.get("page", 1)
+#             page_text = page.get("text", "").strip()
+#             if not page_text:
+#                 continue
+#             lines = normalize_page_lines(page_text, page_number)
+#             chunks.extend(split_page_lines(lines, page_number))
+
+#     full_text = extracted.get("full_text", "")
+#     if is_ocr:
+#         from src.ocr.text_cleanup import normalize_ocr_page_text
+
+#         full_text = normalize_ocr_page_text(full_text)
+
+#     if not chunks and full_text:
+#         chunks.append(
+#             {
+#                 "chunk_id": "full_1",
+#                 "section_type": "full",
+#                 "heading": "Full Document",
+#                 "page_start": 1,
+#                 "page_end": extracted.get("page_count", 1),
+#                 "text": full_text,
+#             }
+#         )
+
+#     chunks.append(
+#         {
+#             "chunk_id": "full_document",
+#             "section_type": "full",
+#             "heading": "Complete Document",
+#             "page_start": 1,
+#             "page_end": extracted.get("page_count", 1),
+#             "text": full_text,
+#         }
+#     )
+
+#     return {
+#         "source_path": extracted.get("source_path"),
+#         "file_name": extracted.get("file_name"),
+#         "file_stem": extracted.get("file_stem"),
+#         "page_count": extracted.get("page_count", 0),
+#         "extraction_method": extracted.get("extraction_method", "native"),
+#         "ocr_engine": extracted.get("ocr_engine"),
+#         "chunk_strategy": "page" if use_page_chunks else "section",
+#         "chunk_count": len(chunks),
+#         "chunks": chunks,
+#     }
 def chunk_document(extracted: dict) -> dict:
     is_ocr = extracted.get("extraction_method") == "ocr"
     pages = preprocess_pages_for_chunking(extracted)
@@ -244,7 +353,6 @@ def chunk_document(extracted: dict) -> dict:
     use_page_chunks = False
     if is_ocr:
         from src.ocr.config import load_ocr_config
-
         use_page_chunks = load_ocr_config().get("fallback_to_page_chunks", True)
 
     if use_page_chunks:
@@ -255,13 +363,31 @@ def chunk_document(extracted: dict) -> dict:
             page_text = page.get("text", "").strip()
             if not page_text:
                 continue
-            lines = normalize_page_lines(page_text, page_number)
-            chunks.extend(split_page_lines(lines, page_number))
+
+            # ✅ UPDATED: separate content + page_numbers
+            lines, page_numbers = normalize_page_lines(page_text, page_number)
+
+            # ✅ existing chunking
+            page_chunks = split_page_lines(lines, page_number, page)
+            chunks.extend(page_chunks)
+
+            # ✅ NEW: footer chunk creation
+            if page_numbers:
+                chunks.append(
+                    {
+                        "chunk_id": f"p{page_number}_footer",
+                        "section_type": "footer",
+                        "heading": "Footer",
+                        "page_start": page_number,
+                        "page_end": page_number,
+                        "text": "\n".join(page_numbers),
+                        "page_numbers": page_numbers,
+                    }
+                )
 
     full_text = extracted.get("full_text", "")
     if is_ocr:
         from src.ocr.text_cleanup import normalize_ocr_page_text
-
         full_text = normalize_ocr_page_text(full_text)
 
     if not chunks and full_text:
@@ -297,8 +423,11 @@ def chunk_document(extracted: dict) -> dict:
         "chunk_strategy": "page" if use_page_chunks else "section",
         "chunk_count": len(chunks),
         "chunks": chunks,
-    }
+        
+        # ✅ ADD THIS (VERY IMPORTANT)
+        "document_fonts": extracted.get("document_fonts", []),
 
+    }
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Create section-wise chunks from extracted JSON.")

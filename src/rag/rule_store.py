@@ -105,15 +105,41 @@ def get_collection_name() -> str:
     return config.get("chroma_collection", "gdp_rules")
 
 
+# def build_rule_document(rule: dict) -> str:
+#     return "\n".join([
+#         f"Rule ID: {rule.get('rule_id', '')}",
+#         f"Title: {rule.get('title', '')}",
+#         f"Category: {rule.get('category', '')}",
+#         f"Criteria: {rule.get('verifiable_criteria', '')}",
+#         f"recommendation": {rule.get('recommendation', '')}",
+#         f"applies_to_sections: {rule.get('applies_to_sections', '')}"
+        
+#     ])
+
+# def build_rule_document(rule: dict) -> str:
+#     return "\n".join([
+#         f"Rule ID: {rule.get('rule_id', '')}",
+#         f"Title: {rule.get('title', '')}",
+#         f"Category: {rule.get('category', '')}",
+#         f"Criteria: {rule.get('verifiable_criteria', '')}",
+#         f"Recommendation: {rule.get('recommendation', '')}",
+#         f"applies_to_sections: {rule.get('applies_to_sections', '')}"
+#     ])
+
 def build_rule_document(rule: dict) -> str:
-    return "\n".join([
-        f"Rule ID: {rule.get('rule_id', '')}",
-        f"Title: {rule.get('title', '')}",
-        f"Category: {rule.get('category', '')}",
-        f"Criteria: {rule.get('verifiable_criteria', '')}",
-    ])
+    sections = ", ".join(rule.get("applies_to_sections", []))
+    keywords = ", ".join(rule.get("keywords", []))
+    phrases = ", ".join(rule.get("typical_phrases", []))
 
-
+    return (
+        f"{rule.get('title', '')}. "
+        f"This rule applies to {sections}. "
+        f"It checks that {rule.get('verifiable_criteria', '')}. "
+        f"Intent: {rule.get('validation_intent', '')}. "
+        f"Examples: {phrases}. "
+        f"Keywords: {keywords}."
+    )
+    
 def get_embedding_function():
     provider = get_embedding_provider()
 
@@ -186,15 +212,27 @@ def embed_rules(rules_path: Path | None = None, *, rebuild: bool = False) -> dic
 
     ids = [rule["rule_id"] for rule in rules]
     documents = [build_rule_document(rule) for rule in rules]
+    # metadatas = [
+    #     {
+    #         "rule_id": rule["rule_id"],
+    #         "title": rule.get("title", ""),
+    #         "category": rule.get("category", ""),
+    #         "severity": rule.get("severity", ""),
+    #     }
+    #     for rule in rules
+    # ]
     metadatas = [
-        {
-            "rule_id": rule["rule_id"],
-            "title": rule.get("title", ""),
-            "category": rule.get("category", ""),
-            "severity": rule.get("severity", ""),
-        }
-        for rule in rules
-    ]
+    {
+        "rule_id": rule["rule_id"],
+        "title": rule.get("title", ""),
+        "category": rule.get("category", ""),
+        "severity": rule.get("severity", ""),
+        "rule_type": rule.get("rule_type", ""),
+        "applies_to_sections": rule.get("applies_to_sections", []),
+        "keywords": rule.get("keywords", [])
+    }
+    for rule in rules
+]
 
     collection.upsert(ids=ids, documents=documents, metadatas=metadatas)
 

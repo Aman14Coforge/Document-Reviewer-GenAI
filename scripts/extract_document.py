@@ -15,34 +15,108 @@ from src.output_utils import build_output_path, run_timestamp
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
-def extract_pdf(path: Path) -> dict:
+# def extract_pdf(path: Path) -> dict:
+#     import pdfplumber
+
+#     pages = []
+#     with pdfplumber.open(path) as pdf:
+#         for index, page in enumerate(pdf.pages, start=1):
+#             text = (
+#                 page.extract_text(x_tolerance=10, y_tolerance=5) or ""
+#             ).strip()
+#             if not text:
+#                 text = _extract_tables_as_text(page)
+
+#             pages.append(
+#                 {
+#                     "page": index,
+#                     "text": text,
+#                 }
+#             )
+
+#     full_text = "\n\n".join(
+#         f"--- Page {page['page']} ---\n{page['text']}" for page in pages if page["text"]
+#     )
+#     return {
+#         "page_count": len(pages),
+#         "pages": pages,
+#         "full_text": full_text.strip(),
+#     }
+
+def extract_pdf_with_fonts(path: Path) -> dict:
     import pdfplumber
+    import fitz
+
+    # ✅ open fitz separately for fonts
+    fitz_doc = fitz.open(path)
 
     pages = []
+    all_fonts = set()  # document-level fonts
+
+    # ✅ fonts to ignore for GDP-08 (icons, symbols)
+    IGNORE_FONTS = {"wingdings", "symbol"}
+
     with pdfplumber.open(path) as pdf:
         for index, page in enumerate(pdf.pages, start=1):
+
+            # ✅ ORIGINAL TEXT EXTRACTION (UNCHANGED)
             text = (
                 page.extract_text(x_tolerance=10, y_tolerance=5) or ""
             ).strip()
+
             if not text:
                 text = _extract_tables_as_text(page)
 
+            # ✅ FONT EXTRACTION USING FITZ
+            fonts = set()
+
+            fitz_page = fitz_doc[index - 1]
+            text_dict = fitz_page.get_text("dict")
+
+            for block in text_dict.get("blocks", []):
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+
+                        font = span.get("font")
+
+                        if font:
+                            # ✅ base normalization
+                            font = font.split("+")[-1].lower()
+
+                            # ✅ remove style variations
+                            for token in ["-bold", "-italic", "bold", "italic", "mt", "-regular"]:
+                                font = font.replace(token, "")
+
+                            font = font.strip()
+
+                            # ✅ ignore non-content fonts
+                            if font in IGNORE_FONTS:
+                                continue
+
+                            fonts.add(font)
+                            all_fonts.add(font)
+
+            # ✅ STORE PAGE
             pages.append(
                 {
                     "page": index,
                     "text": text,
+                    "fonts": list(fonts),
                 }
             )
 
+    # ✅ ORIGINAL FULL TEXT (UNCHANGED)
     full_text = "\n\n".join(
-        f"--- Page {page['page']} ---\n{page['text']}" for page in pages if page["text"]
+        f"--- Page {page['page']} ---\n{page['text']}"
+        for page in pages if page["text"]
     )
+
     return {
         "page_count": len(pages),
         "pages": pages,
         "full_text": full_text.strip(),
+        "document_fonts": list(all_fonts),
     }
-
 
 def _extract_tables_as_text(page) -> str:
     """Fallback when page text is empty but tables exist (e.g. scanned forms)."""
@@ -144,7 +218,7 @@ def extract_document(
 
         extracted = extract_pdf_ocr(path, ocr_config_path)
     elif suffix == ".pdf":
-        extracted = extract_pdf(path)
+        extracted = extract_pdf_with_fonts(path)
     elif suffix == ".docx":
         extracted = extract_docx(path)
     elif suffix == ".txt":

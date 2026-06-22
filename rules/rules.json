@@ -7,8 +7,10 @@
       "category": "header",
       "severity": "high",
       "rule_type": "semantic",
-      "verifiable_criteria": "Verify whether the document title on the first page matches the uploaded file name.",
-      "recommendation": "Ensure the first page title matches the file name.",
+      "verifiable_criteria": "Check whether the main document title on the first page semantically matches the uploaded file name.",
+      "validation_intent": "Ensure document identity consistency.",
+      "typical_phrases": ["DEPLOYMENT REPORT", "SYSTEM VERSION 1.0"],
+      "keywords": ["document title", "file name", "report name"],
       "applies_to_sections": ["first_page", "header"],
       "requires_metadata": ["file_name"]
     },
@@ -18,9 +20,11 @@
       "category": "header",
       "severity": "medium",
       "rule_type": "semantic",
-      "verifiable_criteria": "Check whether both author name and author role are mentioned in the document.",
-      "recommendation": "Add author name and role information.",
-      "applies_to_sections": ["first_page", "header"]
+      "verifiable_criteria": "Check whether both author name and role are present.",
+      "validation_intent": "Ensure accountability.",
+      "typical_phrases": ["Prepared by", "Author", "NAME / TITLE"],
+      "keywords": ["author", "role", "prepared by"],
+      "applies_to_sections": ["first_page", "approval"]
     },
     {
       "rule_id": "GDP-03",
@@ -28,8 +32,10 @@
       "category": "revision_history",
       "severity": "medium",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that all dates in the revision history are valid calendar dates.",
-      "recommendation": "Correct invalid revision dates.",
+      "verifiable_criteria": "Validate all revision dates are valid calendar dates.",
+      "validation_intent": "Ensure accuracy of revision tracking.",
+      "typical_phrases": ["REVISION HISTORY"],
+      "keywords": ["revision date", "change log"],
       "applies_to_sections": ["revision_history"]
     },
     {
@@ -38,8 +44,10 @@
       "category": "revision_history",
       "severity": "high",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that version number is present in both title section and revision history section.",
-      "recommendation": "Add version information consistently.",
+      "verifiable_criteria": "Check version consistency across title and revision history.",
+      "validation_intent": "Ensure version traceability.",
+      "typical_phrases": ["VERSION 1.0", "REVISION NO"],
+      "keywords": ["version", "revision number"],
       "applies_to_sections": ["first_page", "header", "revision_history"]
     },
     {
@@ -48,8 +56,10 @@
       "category": "revision_history",
       "severity": "medium",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that a revision history section exists in the document.",
-      "recommendation": "Add a revision history section.",
+      "verifiable_criteria": "Check if revision history section exists.",
+      "validation_intent": "Ensure document tracking.",
+      "typical_phrases": ["REVISION HISTORY"],
+      "keywords": ["revision history", "change log"],
       "applies_to_sections": ["revision_history", "full"]
     },
     {
@@ -58,8 +68,10 @@
       "category": "approval",
       "severity": "high",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that approval or signature blocks exist in the document.",
-      "recommendation": "Add approval signature blocks.",
+      "verifiable_criteria": "Check approval/signature blocks exist.",
+      "validation_intent": "Ensure formal approval.",
+      "typical_phrases": ["SIGNATURE", "APPROVER"],
+      "keywords": ["signature", "approval"],
       "applies_to_sections": ["approval"]
     },
     {
@@ -68,8 +80,10 @@
       "category": "approval",
       "severity": "medium",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that dates are present near signature blocks.",
-      "recommendation": "Add signature dates.",
+      "verifiable_criteria": "Check dates exist near signatures.",
+      "validation_intent": "Ensure approval timestamps.",
+      "typical_phrases": ["DATE", "SIGNED ON"],
+      "keywords": ["date", "signature date"],
       "applies_to_sections": ["approval"]
     },
     {
@@ -77,9 +91,11 @@
       "title": "Basic Font and Spacing Consistency",
       "category": "formatting",
       "severity": "low",
-      "rule_type": "semantic",
-      "verifiable_criteria": "Evaluate whether font usage and spacing appear reasonably consistent throughout the document.",
-      "recommendation": "Standardize fonts and spacing.",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Check formatting consistency.",
+      "validation_intent": "Ensure readability.",
+      "typical_phrases": ["paragraph sections"],
+      "keywords": ["font", "spacing"],
       "applies_to_sections": ["body", "full"],
       "always_include": true
     },
@@ -89,8 +105,10 @@
       "category": "language",
       "severity": "medium",
       "rule_type": "semantic",
-      "verifiable_criteria": "Identify grammar, spelling, or language quality issues.",
-      "recommendation": "Review language and grammar.",
+      "verifiable_criteria": "Detect grammar and spelling issues.",
+      "validation_intent": "Ensure language quality.",
+      "typical_phrases": ["text content"],
+      "keywords": ["grammar", "spelling"],
       "applies_to_sections": ["body", "full"],
       "always_include": true
     },
@@ -100,8 +118,10 @@
       "category": "structure",
       "severity": "high",
       "rule_type": "semantic",
-      "verifiable_criteria": "Verify that mandatory sections such as Objective, Scope, Responsibilities, Procedure, and References are present.",
-      "recommendation": "Add missing mandatory sections.",
+      "verifiable_criteria": "Check presence of mandatory sections.",
+      "validation_intent": "Ensure completeness.",
+      "typical_phrases": ["INTRODUCTION", "SCOPE"],
+      "keywords": ["sections", "objective"],
       "applies_to_sections": ["structure", "full"],
       "always_include": true
     },
@@ -111,9 +131,11 @@
       "category": "footer",
       "severity": "medium",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that page numbers are present and sequential throughout the document.",
-      "recommendation": "Correct page numbering.",
-      "applies_to_sections": ["footer", "full"]
+      "verifiable_criteria": "Check page numbers are sequential.",
+      "validation_intent": "Ensure navigation.",
+      "typical_phrases": ["1", "2", "3"],
+      "keywords": ["page number"],
+      "applies_to_sections": ["footer"]
     },
     {
       "rule_id": "GDP-12",
@@ -121,19 +143,23 @@
       "category": "language",
       "severity": "low",
       "rule_type": "semantic",
-      "verifiable_criteria": "Assess whether the document readability is acceptable for its intended audience.",
-      "recommendation": "Improve readability.",
+      "verifiable_criteria": "Assess readability level.",
+      "validation_intent": "Ensure clarity.",
+      "typical_phrases": ["paragraph text"],
+      "keywords": ["readability"],
       "applies_to_sections": ["body", "full"],
       "always_include": true
     },
     {
       "rule_id": "GDP-13",
-      "title": "Footer Contains Doc ID, Page Number, Confidentiality",
+      "title": "Footer Contains At Least One of (Doc ID / Page Number / Confidentiality)",
       "category": "footer",
       "severity": "high",
       "rule_type": "deterministic",
-      "verifiable_criteria": "Verify that footer contains document ID, page number, and confidentiality statement.",
-      "recommendation": "Add required footer information.",
+      "verifiable_criteria": "Check whether the footer contains one or more of the following: Document ID, Page number, or Confidentiality statement. If at least one is present, consider the rule as passed. Only fail if none of these elements are found.",
+      "validation_intent": "Ensure compliance.",
+      "typical_phrases": ["CONFIDENTIAL", "DOC ID"],
+      "keywords": ["footer", "confidential", "doc id", "page"],
       "applies_to_sections": ["footer"]
     }
   ]
