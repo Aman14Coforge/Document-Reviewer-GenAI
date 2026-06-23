@@ -47,19 +47,19 @@ def extract_pdf_with_fonts(path: Path) -> dict:
     import pdfplumber
     import fitz
 
-    # ✅ open fitz separately for fonts
+    #  open fitz separately for fonts
     fitz_doc = fitz.open(path)
 
     pages = []
     all_fonts = set()  # document-level fonts
 
-    # ✅ fonts to ignore for GDP-08 (icons, symbols)
+    #  fonts to ignore for GDP-08 (icons, symbols)
     IGNORE_FONTS = {"wingdings", "symbol"}
 
     with pdfplumber.open(path) as pdf:
         for index, page in enumerate(pdf.pages, start=1):
 
-            # ✅ ORIGINAL TEXT EXTRACTION (UNCHANGED)
+            #  ORIGINAL TEXT EXTRACTION (UNCHANGED)
             text = (
                 page.extract_text(x_tolerance=10, y_tolerance=5) or ""
             ).strip()
@@ -67,7 +67,7 @@ def extract_pdf_with_fonts(path: Path) -> dict:
             if not text:
                 text = _extract_tables_as_text(page)
 
-            # ✅ FONT EXTRACTION USING FITZ
+            #  FONT EXTRACTION USING FITZ
             fonts = set()
 
             fitz_page = fitz_doc[index - 1]
@@ -80,23 +80,23 @@ def extract_pdf_with_fonts(path: Path) -> dict:
                         font = span.get("font")
 
                         if font:
-                            # ✅ base normalization
+                            #  base normalization
                             font = font.split("+")[-1].lower()
 
-                            # ✅ remove style variations
+                            #  remove style variations
                             for token in ["-bold", "-italic", "bold", "italic", "mt", "-regular"]:
                                 font = font.replace(token, "")
 
                             font = font.strip()
 
-                            # ✅ ignore non-content fonts
+                            # ignore non-content fonts
                             if font in IGNORE_FONTS:
                                 continue
 
                             fonts.add(font)
                             all_fonts.add(font)
 
-            # ✅ STORE PAGE
+            #  STORE PAGE
             pages.append(
                 {
                     "page": index,
@@ -105,7 +105,7 @@ def extract_pdf_with_fonts(path: Path) -> dict:
                 }
             )
 
-    # ✅ ORIGINAL FULL TEXT (UNCHANGED)
+    #  ORIGINAL FULL TEXT (UNCHANGED)
     full_text = "\n\n".join(
         f"--- Page {page['page']} ---\n{page['text']}"
         for page in pages if page["text"]

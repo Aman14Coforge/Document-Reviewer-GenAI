@@ -98,7 +98,7 @@ def slim_rules_for_prompt(rules: list[dict]) -> list[dict]:
            "rule_id": rule.get("rule_id"),
            "title": rule.get("title"),
            "verifiable_criteria": rule.get("verifiable_criteria"),
-           #"keywords": rule.get("keywords"),   # ✅ ADD THIS
+           #"keywords": rule.get("keywords"),   # ADD THIS
        }
        for rule in rules
    ]
@@ -220,15 +220,15 @@ def evaluate_chunk(
 
     selected_rules = filtered_rules
     
-    # ✅ DEBUG START
+    #  DEBUG START
     print("\n-----------------------------")
     print("Chunk:", chunk["chunk_id"], "| Section:", chunk.get("section_type"))
     print("Selected Rules:", [r["rule_id"] for r in selected_rules])
     print("-----------------------------\n")
-    # ✅ DEBUG END
+    #  DEBUG END
 
     
-# ✅ Create LLM-specific rules
+#  Create LLM-specific rules
     llm_rules = [
         rule for rule in selected_rules
         if rule["rule_id"] not in ["GDP-08", "GDP-12"]
@@ -393,7 +393,7 @@ def evaluate_chunk(
 #     chunks_data: dict,
 # ) -> dict:
 
-#     # ✅ STEP 1: Select rules
+#     # STEP 1: Select rules
 #     if chunk_rules is not None:
 #         selected_rules = chunk_rules
 #     else:
@@ -401,7 +401,7 @@ def evaluate_chunk(
 #             rules, chunk, include_all=include_all_rules
 #         )
 
-#     # ✅ STEP 2: Section filtering
+#     #  STEP 2: Section filtering
 #     section_type = chunk.get("section_type")
 
 #     filtered_rules = []
@@ -412,7 +412,7 @@ def evaluate_chunk(
 
 #     selected_rules = filtered_rules
 
-#     # ✅ STEP 2.5: Deterministic rules (GDP-08)
+#     #  STEP 2.5: Deterministic rules (GDP-08)
 #     deterministic_results = []
 
 #     for rule in selected_rules:
@@ -426,7 +426,7 @@ def evaluate_chunk(
 #                     continue
 #                 fonts.update(c.get("fonts", []))
 
-#             # ✅ ✅ FIX 1: HANDLE EMPTY FONT CASE
+#             #  FIX 1: HANDLE EMPTY FONT CASE
 #             if not fonts:
 #                 result = {
 #                     "rule_id": "GDP-08",
@@ -458,10 +458,10 @@ def evaluate_chunk(
 
 #             deterministic_results.append(result)
 
-#     # ✅ REMOVE GDP-08 from LLM
+#     # REMOVE GDP-08 from LLM
 #     selected_rules = [r for r in selected_rules if r["rule_id"] != "GDP-08"]
 
-#     # ✅ EARLY RETURN IF ONLY DETERMINISTIC RULE
+#     #  EARLY RETURN IF ONLY DETERMINISTIC RULE
 #     if not selected_rules and deterministic_results:
 #         for item in deterministic_results:
 #             item["chunk_id"] = chunk.get("chunk_id")
@@ -474,7 +474,7 @@ def evaluate_chunk(
 #             "results": deterministic_results,
 #         }
 
-#     # ✅ STEP 3: Document content
+#     #  STEP 3: Document content
 #     document_content = chunk.get("text", "")
 
 #     if chunk.get("chunk_id") != "whole_document":
@@ -486,7 +486,7 @@ def evaluate_chunk(
 #             f"{chunk.get('text', '')}"
 #         )
 
-#     # ✅ STEP 4: Footer aggregation
+#     #  STEP 4: Footer aggregation
 #     if section_type == "footer":
 #         footer_chunks = [
 #             c for c in chunks_data.get("chunks", [])
@@ -503,7 +503,7 @@ def evaluate_chunk(
 #             f"{footer_text}"
 #         )
 
-#     # ✅ STEP 5: Config
+#     #  STEP 5: Config
 #     rag_config = load_chunk_rag_config()
 
 #     rules_for_prompt = (
@@ -512,7 +512,7 @@ def evaluate_chunk(
 #         else selected_rules
 #     )
 
-#     # ✅ STEP 6: Prompt
+#     #  STEP 6: Prompt
 #     prompt = load_prompt(
 #         prompt_path,
 #         FILE_NAME=file_name,
@@ -523,7 +523,7 @@ def evaluate_chunk(
 #         DOCUMENT_CONTENT=document_content,
 #     )
 
-#     # ✅ STEP 7: LLM
+#     #  STEP 7: LLM
 #     results = []
 #     normalization_stats = {}
 
@@ -542,22 +542,22 @@ def evaluate_chunk(
 #                 section_type=str(section_type),
 #             )
 
-#     # ✅ ADD deterministic results
+#     #  ADD deterministic results
 #     results.extend(deterministic_results)
 
-#     # ✅ metadata
+#     #  metadata
 #     for item in results:
 #         item["chunk_id"] = chunk.get("chunk_id")
 #         item["section_type"] = section_type
 
-#     # ✅ ✅ FIX 2: REMOVE DUPLICATES
+#     #  FIX 2: REMOVE DUPLICATES
 #     rules_evaluated = list({
 #         r["rule_id"] for r in selected_rules
 #     } | {
 #         r["rule_id"] for r in deterministic_results
 #     })
 
-#     # ✅ output
+#     #  output
 #     output = {
 #         "chunk_id": chunk.get("chunk_id"),
 #         "section_type": section_type,
@@ -703,7 +703,7 @@ def merge_results(
         existing_status = existing.get("status", "insufficient_evidence")
         incoming_status = incoming.get("status", "insufficient_evidence")
 
-        # ✅ NEVER override PASS
+        # NEVER override PASS
         if existing_status == "passed":
             return existing
 
@@ -716,7 +716,7 @@ def merge_results(
                 ),
             }
 
-        # ✅ use GLOBAL STATUS_PRIORITY here
+        #  use GLOBAL STATUS_PRIORITY here
         if STATUS_PRIORITY.get(incoming_status, 0) > STATUS_PRIORITY.get(existing_status, 0):
             return {
                 **existing,
@@ -728,7 +728,7 @@ def merge_results(
 
         return existing
 
-    # ✅ MERGE LOOP
+    #  MERGE LOOP
     for chunk_output in chunk_outputs:
         allowed_rule_ids = set(chunk_output.get("rules_evaluated", []))
 
@@ -750,7 +750,7 @@ def merge_results(
 
             merged[rule_id] = merge_rule(current, incoming_item)
 
-    # ✅ FINAL ORDERING
+    #  FINAL ORDERING
     ordered = []
 
     for rule in rule_catalog:
@@ -872,10 +872,10 @@ def check_compliance_with_rag(
    #summary = summarize(merged_results)
    merged_results = merge_results(rules, chunk_outputs)
 
-    # ✅ GDP-08 override
+    #  GDP-08 override
    font_result = evaluate_font_consistency(chunks_data)
 
-    # ✅ GDP-12 override
+    #  GDP-12 override
    readability_result = evaluate_readability(chunks_data)
 
    for i, r in enumerate(merged_results):

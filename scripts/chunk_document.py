@@ -76,7 +76,7 @@ def normalize_page_lines(page_text: str, page_number: int) -> tuple[list[str], l
     page_numbers = []
 
     for i, line in enumerate(lines):
-        # ✅ Only last line and must match page number
+        #  Only last line and must match page number
         if i == len(lines) - 1 and line.isdigit() and line == str(page_number):
             page_numbers.append(line)
         else:
@@ -149,13 +149,13 @@ def detect_section_type(text: str, page_number: int, heading: str) -> str:
         return "approval"
 
     if TOC_PATTERNS.search(probe):
-        return "structure"  # ✅ Only TOC is structure
+        return "structure"  # Only TOC is structure
 
-    # ❌ REMOVE this behavior (it was causing wrong classification)
+    #  REMOVE this behavior (it was causing wrong classification)
     # if TOP_LEVEL_SECTION.match(heading) or MAJOR_SECTION.match(heading):
     #     return "structure"
 
-    # ❌ CHANGE this: headings like Introduction should be BODY
+    #  CHANGE this: headings like Introduction should be BODY
     if STRUCTURE_HEADING.search(heading):
         return "body"
 
@@ -184,7 +184,7 @@ def split_page_lines(lines: list[str], page_number: int, page: dict) -> list[dic
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
-                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
+                #"fonts": page.get("fonts", []),   #ADD THIS
             }
         ]
 
@@ -198,7 +198,7 @@ def split_page_lines(lines: list[str], page_number: int, page: dict) -> list[dic
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": page_text.strip(),
-                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
+                #"fonts": page.get("fonts", []),   #  ADD THIS
             }
         ]
 
@@ -219,7 +219,7 @@ def split_page_lines(lines: list[str], page_number: int, page: dict) -> list[dic
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
-                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
+                #"fonts": page.get("fonts", []),   #  ADD THIS
             }
         )
         current_lines = []
@@ -260,7 +260,7 @@ def chunk_pages_only(pages: list[dict], page_count: int) -> list[dict]:
                 "page_start": page_number,
                 "page_end": page_number,
                 "text": text,
-                #"fonts": page.get("fonts", []),   # ✅ ADD THIS
+                #"fonts": page.get("fonts", []),   #  ADD THIS
             }
         )
     return chunks
@@ -364,14 +364,14 @@ def chunk_document(extracted: dict) -> dict:
             if not page_text:
                 continue
 
-            # ✅ UPDATED: separate content + page_numbers
+            #  UPDATED: separate content + page_numbers
             lines, page_numbers = normalize_page_lines(page_text, page_number)
 
-            # ✅ existing chunking
+            #  existing chunking
             page_chunks = split_page_lines(lines, page_number, page)
             chunks.extend(page_chunks)
 
-            # ✅ NEW: footer chunk creation
+            #  NEW: footer chunk creation
             if page_numbers:
                 chunks.append(
                     {
@@ -424,7 +424,7 @@ def chunk_document(extracted: dict) -> dict:
         "chunk_count": len(chunks),
         "chunks": chunks,
         
-        # ✅ ADD THIS (VERY IMPORTANT)
+        #  ADD THIS
         "document_fonts": extracted.get("document_fonts", []),
 
     }
