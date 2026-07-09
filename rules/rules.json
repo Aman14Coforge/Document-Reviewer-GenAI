@@ -161,6 +161,158 @@
       "typical_phrases": ["CONFIDENTIAL", "DOC ID"],
       "keywords": ["footer", "confidential", "doc id", "page"],
       "applies_to_sections": ["footer"]
+    },
+    {
+      "rule_id": "GDP-14",
+      "title":"Compliance Section Contains At Least One of (Verification / SOP / Regulatory Alignment Statement)",
+      "category": "body",
+      "severity": "medium",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Check whether the document contains at least one explicit compliance or verification statement where the document declares that it has been reviewed, verified, or is aligned with SOPs, standards, or regulatory requirements. The statement must be declarative (e.g., confirming compliance or verification), not just a reference, identifier, citation, or mention of compliance-related terms. If such a statement is found, return the exact sentence as evidence. Consider the rule as passed only if a clear compliance declaration is present with supporting evidence. Fail if only references or identifiers are found or if no explicit statement can be extracted.",
+      "validation_intent": "Ensure compliance.",
+      "typical_phrases": [
+        "in compliance with",
+        "aligned with regulatory requirements",
+        "reviewed and verified",
+        "as per SOP",
+        "follows standards",
+        "verified for compliance"
+      ],
+      "keywords": [
+        "compliance",
+        "sop",
+        "regulatory",
+        "verified",
+        "reviewed",
+        "standards",
+        "requirements"
+      ],
+      "applies_to_sections": ["body", "full"]
+      
+    },
+    {
+      "rule_id": "GDP-15",
+      "title":"Documnet Classification(Report / Plan / Design Specification / Requirement Specification)",  
+      "category": "header",
+      "severity": "medium",
+      "rule_type": "semantic",
+      "verifiable_criteria": "Determine whether the document can be classified into at least one of the following categories based on its title, headings, or content: Report, Plan, Design Specification, or Requirement Specification. Consider the rule as passed if a clear classification is identified. Fail only if classification is not possible.",
+      "validation_intent": "Ensure the document can be clearly identified by its type.",
+      "typical_phrases": [
+        "deployment report",
+        "functional requirement specification"
+      ],
+      "keywords": [
+        "report",
+        "plan",
+        "design",
+        "specification",
+        "requirement",
+        "FRS",
+        "DRP"
+      ],
+      "applies_to_sections": ["header", "first_page"]
+      
+    },
+    {
+      "rule_id": "GDP-16",
+      "title": "Section Contains At Least One of (Valid Content / Description / Explanation After Heading)",
+      "category": "content",
+      "severity": "high",
+      "rule_type": "hybrid",
+      "verifiable_criteria": "Check whether each section heading is followed by meaningful and complete content. The content must not be empty and must not consist only of repeated headings or insufficient text. Consider the rule as passed if valid descriptive or explanatory content is present after the heading. Fail if the section lacks meaningful content or contains only minimal or repetitive information.",
+      "validation_intent": "Ensure all document sections are properly completed with meaningful and usable content.",
+      "typical_phrases": [
+        "objective",
+        "description",
+        "details",
+        "summary",
+        "results"
+      ],
+      "keywords": [
+        "content",
+        "details",
+        "description",
+        "information",
+        "section"
+      ],
+      "applies_to_sections": ["body", "approval", "structure"]
+      
+    },
+    {
+      "rule_id": "GDP-17",
+      "title": "Document Uses Consistent Terminology (No Alternate Terms for Same Concept)",
+      "category": "content",
+      "severity": "medium",
+      "rule_type": "hybrid",
+      "verifiable_criteria": "Check whether consistent terminology is used across the entire document for the same concepts or entities. Different words, phrases, or abbreviations should not be used interchangeably to refer to the same concept (e.g., Employee vs Staff Member, User vs Account Holder, or inconsistent expansion of the same abbreviation). For example, if a section refers to 'Approver', it should not be referred to as 'Author' elsewhere unless they represent different roles. Consider the rule as passed if terminology is used consistently throughout the document. Fail if multiple semantically similar but different terms are used for the same meaning or if the same abbreviation is used with different expansions.",
+      "validation_intent": "Ensure clarity, consistency, and unambiguous interpretation by maintaining uniform terminology throughout the document.",
+      "typical_phrases": [
+        "employee",
+        "staff member",
+        "user",
+        "account holder",
+        "approver",
+        "author",
+        "system",
+        "application",
+        "protocol",
+        "qualification"
+      ],
+      "keywords": [
+        "terminology",
+        "consistency",
+        "naming",
+        "abbreviation",
+        "definition",
+        "entity",
+        "reference"
+      ],
+      "applies_to_sections": ["approval","body"],
+      "always_include": true
+    },
+    {
+      "rule_id": "GDP-18",
+      "title": "References Exist in Regulatory Database",
+      "category": "reference",
+      "severity": "high",
+      "rule_type": "deterministic",
+      "verifiable_criteria": "Check whether all document IDs listed in the reference section exist in the approved regulatory database.",
+      "validation_intent": "Ensure all referenced documents are valid and approved.",
+      "keywords": ["reference", "doc id", "regulatory"],
+      "applies_to_sections": ["reference"]
+    
+    },
+    {
+      "rule_id": "GDP-19",
+      "title": "Traceability Links Between URS, FRS, and Test Cases Are Present",
+      "category": "traceability",
+      "severity": "high",
+      "rule_type": "hybrid",
+      "verifiable_criteria": "Check whether the document contains traceability statements linking URS requirements to URD/FRS and/or Test Cases (e.g., 'This system satisfies the following requirements: URS-002').",
+      "validation_intent": "Ensure end-to-end traceability between requirements, functional specifications, and test cases.",
+      "typical_phrases": [
+        "traceability matrix",
+        "mapped to",
+        "satisfies the following requirements",
+        "linked to",
+        "URS-",
+        "FRS-",
+        "TC-"
+      ],
+      "keywords": [
+        "traceability",
+        "URS",
+        "FRS",
+        "test case",
+        "mapping",
+        "requirement"
+      ],
+      "applies_to_sections": ["body"]
     }
+
+
+
+
   ]
 }

@@ -159,6 +159,13 @@ def match_rules_to_chunks(
            #  3. Semantic retrieval
            retrieved_ids = retrieve_rule_ids_for_text(enriched_text, top_k=top_k)
 
+           
+           retrieved_ids = [
+                rid for rid in retrieved_ids
+                if rid not in ["GDP-11", "GDP-13"]
+            ]
+
+
            #  4. Section filtering
            candidate_rule_ids = {
                r["rule_id"]
@@ -174,6 +181,10 @@ def match_rules_to_chunks(
 
            #  5. Keyword matching (hybrid enhancement)
            keyword_ids = keyword_match_rules(text, all_rules)
+           keyword_ids = [
+                rid for rid in keyword_match_rules(text, all_rules)
+                if rid not in ["GDP-11", "GDP-13"]
+            ]
 
            retrieved_ids = list(set(retrieved_ids + keyword_ids))
 

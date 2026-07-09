@@ -47,13 +47,13 @@ def extract_pdf_with_fonts(path: Path) -> dict:
     import pdfplumber
     import fitz
 
-    #  open fitz separately for fonts
+    # open fitz separately for fonts
     fitz_doc = fitz.open(path)
 
     pages = []
     all_fonts = set()  # document-level fonts
 
-    #  fonts to ignore for GDP-08 (icons, symbols)
+    # fonts to ignore for GDP-08 (icons, symbols)
     IGNORE_FONTS = {"wingdings", "symbol"}
 
     with pdfplumber.open(path) as pdf:
@@ -89,7 +89,7 @@ def extract_pdf_with_fonts(path: Path) -> dict:
 
                             font = font.strip()
 
-                            # ignore non-content fonts
+                            #  ignore non-content fonts
                             if font in IGNORE_FONTS:
                                 continue
 

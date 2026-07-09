@@ -3,11 +3,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import re
 from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 from src.llm_client import call_llm_json, load_prompt
 from src.output_utils import build_output_path, run_timestamp
+from src.embedding_client import embed_documents
 try:
    from src.rag.chunk_matcher import load_chunk_rag_config
 except ImportError:
@@ -102,6 +104,31 @@ def slim_rules_for_prompt(rules: list[dict]) -> list[dict]:
        }
        for rule in rules
    ]
+
+REGULATORY_DOCS = {"DOC-001", "DOC-002", "DOC-003", "DOC-004","DOC-005"}
+
+def get_reference_chunks(chunks_data):
+    ref_chunks = []
+
+    for chunk in chunks_data.get("chunks", []):
+        heading = chunk.get("heading", "").lower()
+        section_type = chunk.get("section_type", "").lower()
+
+        if "reference" in heading:
+            ref_chunks.append(chunk)
+
+    return ref_chunks
+
+
+def extract_doc_ids_from_chunks(ref_chunks):
+    doc_ids = []
+
+    for chunk in ref_chunks:
+        text = chunk.get("text", "")
+        matches = re.findall(r'\bDOC-\d{3}\b', text)
+        doc_ids.extend(matches)
+
+    return list(set(doc_ids))
 
 # def evaluate_chunk(
 #    chunk: dict,
@@ -231,7 +258,7 @@ def evaluate_chunk(
 #  Create LLM-specific rules
     llm_rules = [
         rule for rule in selected_rules
-        if rule["rule_id"] not in ["GDP-08", "GDP-12"]
+        if rule["rule_id"] not in ["GDP-08", "GDP-12","GDP-16","GDP-18"]
     ]
     print("LLM Rules:", [r["rule_id"] for r in llm_rules])
 
@@ -393,7 +420,7 @@ def evaluate_chunk(
 #     chunks_data: dict,
 # ) -> dict:
 
-#     # STEP 1: Select rules
+#     #  STEP 1: Select rules
 #     if chunk_rules is not None:
 #         selected_rules = chunk_rules
 #     else:
@@ -458,10 +485,10 @@ def evaluate_chunk(
 
 #             deterministic_results.append(result)
 
-#     # REMOVE GDP-08 from LLM
+#     #  REMOVE GDP-08 from LLM
 #     selected_rules = [r for r in selected_rules if r["rule_id"] != "GDP-08"]
 
-#     #  EARLY RETURN IF ONLY DETERMINISTIC RULE
+#     # EARLY RETURN IF ONLY DETERMINISTIC RULE
 #     if not selected_rules and deterministic_results:
 #         for item in deterministic_results:
 #             item["chunk_id"] = chunk.get("chunk_id")
@@ -503,7 +530,7 @@ def evaluate_chunk(
 #             f"{footer_text}"
 #         )
 
-#     #  STEP 5: Config
+#     # STEP 5: Config
 #     rag_config = load_chunk_rag_config()
 
 #     rules_for_prompt = (
@@ -616,7 +643,7 @@ def evaluate_readability(chunks_data: dict) -> dict:
     flesch = textstat.flesch_reading_ease(text)
     grade = textstat.flesch_kincaid_grade(text)
 
-    if flesch >= 25 and grade <= 14:
+    if flesch >= 24 and grade <= 14:
         status = "passed"
     else:
         status = "failed"
@@ -626,6 +653,105 @@ def evaluate_readability(chunks_data: dict) -> dict:
         "status": status,
         "reason": f"Flesch: {flesch:.2f}, Grade: {grade:.2f}",
         "confidence": 0.9,
+    }
+def evaluate_section_content(chunks_data: dict) -> dict:
+    chunks = chunks_data.get("chunks", [])
+
+    if not chunks:
+        return {
+            "rule_id": "GDP-16",
+            "status": "insufficient_evidence",
+            "reason": "No chunks available for evaluation.",
+            "confidence": 0.0,
+        }
+
+    import re
+
+    failed_sections = []
+    valid_sections = []
+
+    for chunk in chunks:
+        section_type = chunk.get("section_type")
+        heading = (chunk.get("heading") or "").strip()
+        text = (chunk.get("text") or "").strip()
+
+        #  Apply only to relevant sections
+        if section_type not in ["body", "approval", "structure"]:
+            continue
+
+        #  Remove heading from text
+        content = text.replace(heading, "").strip()
+
+        #  No content
+        if not content:
+            failed_sections.append(f"{heading} → No content")
+            continue
+
+        #  Too short
+        if len(content) < 30:
+            failed_sections.append(f"{heading} → Content too short")
+            continue
+
+        #  Only headings (no explanation)
+        lines = [l.strip() for l in content.split("\n") if l.strip()]
+        if all(re.match(r"^\d+(\.\d+)*\s+[A-Z\s]+$", l) for l in lines):
+            failed_sections.append(f"{heading} → Only headings present")
+            continue
+
+        #  If passed → collect evidence
+        valid_sections.append(f"{heading} → contains meaningful content")
+
+    #  Final decision
+    if not failed_sections:
+        status = "passed"
+        reason = "All sections contain meaningful content."
+        evidence = "- " + "\n- ".join(valid_sections[:5]) if valid_sections else ""
+        confidence = 0.9
+    else:
+        status = "failed"
+        reason = "Some sections are missing valid content."
+        evidence = "- " + "\n- ".join(failed_sections[:5])
+        confidence = 0.9
+
+    return {
+        "rule_id": "GDP-16",
+        "status": status,
+        "reason": reason,
+        "evidence": evidence,   
+        "confidence": confidence,
+    }
+
+def evaluate_reference_crosscheck(chunks_data):
+    ref_chunks = get_reference_chunks(chunks_data)
+
+    if not ref_chunks:
+        return {
+            "rule_id": "GDP-18",
+            "status": "failed",
+            "reason": "Reference section not found",
+            "evidence": "No chunk with heading containing 'Reference' detected"
+        }
+
+    extracted_refs = extract_doc_ids_from_chunks(ref_chunks)
+
+    if not extracted_refs:
+        return {
+            "rule_id": "GDP-18",
+            "status": "failed",
+            "reason": "No valid DOC IDs found",
+            "evidence": "No DOC-XXX patterns found in reference section"
+        }
+
+    regulatory_docs = {"DOC-001", "DOC-002", "DOC-003", "DOC-004","DOC-005"}
+
+    present = [ref for ref in extracted_refs if ref in regulatory_docs]
+    missing = [ref for ref in extracted_refs if ref not in regulatory_docs]
+
+    return {
+        "rule_id": "GDP-18",
+        "status": "passed" if not missing else "failed",
+        "reason": "All references valid" if not missing else "Invalid references found",
+        "evidence": f"Extracted: {extracted_refs} | Valid: {present} | Missing: {missing}"
     }
 # def merge_results(
 #    rule_catalog: list[dict],
@@ -703,7 +829,7 @@ def merge_results(
         existing_status = existing.get("status", "insufficient_evidence")
         incoming_status = incoming.get("status", "insufficient_evidence")
 
-        # NEVER override PASS
+        #  NEVER override PASS
         if existing_status == "passed":
             return existing
 
@@ -875,14 +1001,32 @@ def check_compliance_with_rag(
     #  GDP-08 override
    font_result = evaluate_font_consistency(chunks_data)
 
-    #  GDP-12 override
+    # GDP-12 override
    readability_result = evaluate_readability(chunks_data)
+
+   
+    # GDP-16 override
+   section_content_result = evaluate_section_content(chunks_data)
+    #GDP-18 override
+   reference_result = evaluate_reference_crosscheck(chunks_data)
+
+
+
 
    for i, r in enumerate(merged_results):
         if r["rule_id"] == "GDP-08":
             merged_results[i] = {**r, **font_result}
-        if r["rule_id"] == "GDP-12":
+        elif r["rule_id"] == "GDP-12":
             merged_results[i] = {**r, **readability_result}
+        
+        elif r["rule_id"] == "GDP-16":
+            merged_results[i] = {**r, **section_content_result}
+        
+        elif r["rule_id"] == "GDP-18":   
+                merged_results[i] = {**r, **reference_result}
+
+
+
 
    summary = summarize(merged_results)
 
