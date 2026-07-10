@@ -1,0 +1,101 @@
+GDP Compliance Rules for Good Documentation Practice (GDP)
+
+Rule GDP-01 (Header, High Severity, Semantic):
+Document Title on First Page Matches File Name.
+Check whether the main document title on the first page semantically matches the file name with minor allowed variations.
+Recommendation: Ensure the first page title matches the file name.
+
+Rule GDP-02 (Header, Medium Severity, Semantic):
+Author/APPROVER Name and Role Are Mentioned.
+Verify presence of an author name, approver name along with role or designation.
+Recommendation: Add author/approver name and role.
+
+Rule GDP-03 (Revision History, Medium Severity, Semantic):
+Dates in Revision History Are Valid.
+Ensure dates follow valid format and represent real calendar dates.
+Recommendation: Correct invalid revision dates.
+
+Rule GDP-04 (Revision History, Medium Severity, Semantic):
+Version Number Present in Title and Revision History.
+Ensure version numbers are consistent across title and revision history.
+Recommendation: Align version numbers across title and revision history.
+
+Rule GDP-05 (Revision History, Medium Severity, Semantic):
+Revision Section Is Present.
+Check for existence of a revision history section.
+Recommendation: Add revision history section.
+
+Rule GDP-06 (Approval, High Severity, Semantic):
+Signature Blocks Are Present.
+Check for approval section with signatures.
+Recommendation: Include approval/signature block.
+
+Rule GDP-07 (Approval, Medium Severity, Semantic):
+Dates Present Near Signatures.
+Check each signature has a date.
+Recommendation: Add dates for all signatures.
+
+Rule GDP-08 (Formatting, Low Severity, Deterministic):
+Basic Font and Spacing Consistency.
+Check font and spacing consistency across the document.
+Recommendation: Standardize formatting.
+
+Rule GDP-09 (Language, Low Severity, Deterministic):
+Language Errors Identified.
+Detect grammar and spelling issues.
+Recommendation: Fix language issues.
+
+Rule GDP-10 (Structure, High Severity, Deterministic):
+Required Sections Present.
+Check mandatory sections such as Introduction, Revision History, and References are present.
+Recommendation: Add missing sections.
+
+Rule GDP-11 (Footer, Medium Severity, Deterministic):
+Page Numbers Present and Sequential.
+Ensure page numbers are present and sequential throughout the document.
+Recommendation: Fix pagination.
+
+Rule GDP-12 (Language, Low Severity, Semantic):
+Readability Within Acceptable Range.
+Assess whether document readability is acceptable for its intended audience.
+Recommendation: Simplify language.
+
+Rule GDP-13 (Footer, High Severity, Deterministic):
+Footer Contains Doc ID, Page Number, Confidentiality.
+Check footer contains document ID, page number, and confidentiality statement.
+Recommendation: Add required footer fields.
+
+Rule GDP-14 (Legal Compliance, High Severity, Deterministic):
+Mandatory Compliance Statement Placement.
+Check required compliance text is present in the document.
+Recommendation: Insert compliance statement.
+
+Rule GDP-15 (Metadata, Medium Severity, Semantic):
+Document Type Classification Validation.
+Ensure a valid document type is specified.
+Recommendation: Specify correct document type.
+
+Rule GDP-16 (Terminology, Medium Severity, Semantic):
+Consistent User and Staff Terminology.
+Ensure consistent terminology for users, staff, and employees throughout the document.
+Recommendation: Use consistent terms.
+
+Rule GDP-17 (Operational Completeness, High Severity, Deterministic):
+No Blank Operational Fields.
+No blank fields or unfilled placeholders are allowed in operational sections.
+Recommendation: Fill all placeholders.
+
+Rule GDP-18 (Cross Document, High Severity, Existential):
+Correct References.
+Cross-check all document references (DOC-xxx) against the reference registry.
+Recommendation: Ensure all referenced document IDs exist in the reference registry.
+
+Rule GDP-19 (Governance, High Severity, Existential):
+No Unauthorized Edits.
+Compare document edit history against authorized users in the audit log.
+Recommendation: Ensure only approved users make modifications.
+
+Rule GDP-20 (Traceability, High Severity, Existential):
+Traceability Links.
+Validate URS to FRS to test case linkage using the traceability matrix.
+Recommendation: Ensure all URS IDs map to FRS and corresponding test cases.

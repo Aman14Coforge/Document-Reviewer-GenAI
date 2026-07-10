@@ -1,0 +1,37 @@
+{
+  "embedding_provider": "local",
+  "embedding_model": "all-MiniLM-L6-v2",
+  "embedding_model_path": "model",
+  "chroma_collection": "gdp_rules",
+  "whole_doc": {
+    "prompt": "prompts/compliance_check_whole_doc.txt",
+    "send_all_rules": true,
+    "hybrid": true
+  },
+  "chunk_rag": {
+    "prompt": "prompts/compliance_check_chunk.txt",
+    "hybrid": true,
+    "top_k_rules_per_chunk": 4,
+    "use_vector_retrieval_only": true,
+    "always_include_rule_ids": [],
+    "section_always_include": {},
+    "skip_chunk_ids": ["full_document"],
+    "fallback_to_all_rules_if_empty": false,
+    "slim_rules_in_prompt": true,
+    "normalize_llm_results": true,
+    "retry_incomplete_llm_response": false,
+    "keyword_rerank": true,
+    "keyword_filter_min_hits": 0,
+    "retrieve_candidate_multiplier": 3,
+    "rag_rule_types": ["semantic"]
+  },
+  "aggregation": {
+    "strategy": "pass_threshold",
+    "pass_if_min_chunk_passes": 1
+  },
+  "external_dependencies": {
+    "audit_log": "data/external/audit_log.json",
+    "reference_registry": "data/external/reference_registry.json",
+    "traceability_matrix": "data/external/traceability_matrix.json"
+  }
+}

@@ -1,0 +1,57 @@
+DEPLOYMENT REPORT
+Document Type: Validation Report
+SOP-001 SYSTEM, VERSION 1.0
+
+DOCUMENT REVIEW AND APPROVAL
+APPROVER(S)
+NAME TITLE / DEPARTMENT SIGNATURE DATE
+John Smith Operations Director JS 08-06-2026
+
+REVISION HISTORY
+REVISION NO. REVISION DATE DESCRIPTION OF CHANGE NAME / TITLE
+1.0 10-06-2026 Initial Draft Jane Doe / QA Manager
+2.0 10-07-2026 Version change Root Doe / TA Manager
+
+TABLE OF CONTENTS
+1 INTRODUCTION
+2 RESPONSIBILITIES
+3 REFERENCES
+
+1 INTRODUCTION
+1.1 PURPOSE
+The purpose of this deployment report is to summarize IQ/PQ results.
+Prepared by Jane Doe, QA Manager.
+
+1.2 SCOPE
+In scope: deployment validation activities for the production system.
+
+2 RESPONSIBILITIES
+2.1 DELIVERY TEAM
+Assist during creation and approval of this Deployment Report.
+
+3 REFERENCES
+Refer to DOC-001 for installation protocol details.
+Refer to DOC-002 for performance qualification protocol.
+Mapped to URS-001 FRS-001 TC-001 in the traceability matrix.
+
+Regulatory compliance: for informational purposes only.
+
+Last modified by aman
+
+CONFIDENTIAL | Doc ID: DMR-2026-V1.0 | Page 1
+
+--- page 2 ---
+
+4 RESULTS
+OBJECTIVE: Confirm deployment acceptance criteria.
+RESULTS: All tests passed without open deviations.
+
+CONFIDENTIAL | Doc ID: DMR-2026-V1.0 | Page 2
+
+--- page 3 ---
+
+5 SIGNATURE VERIFICATION LOG
+NAME TITLE/COMPANY SIGNATURE DATE
+John Smith Operations Director JS 15-08-2026
+
+CONFIDENTIAL | Doc ID: DMR-2026-V1.0 | Page 3

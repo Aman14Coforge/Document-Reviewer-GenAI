@@ -1,4 +1,4 @@
-# Document Reviewer — GDP Compliance Checker
+# Document Reviewer — GDP Compliance Checker POC
 
 Automated compliance checking for PDF, DOCX, and TXT documents against GDP (Good Documentation Practice) rules.
 
